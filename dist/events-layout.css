@@ -1,0 +1,19 @@
+#main:has(.events-hub){background:linear-gradient(165deg,#352346,#151020 28rem);color:#faf4ff}
+.events-hub{width:min(94%,78rem);margin:auto;padding:clamp(2rem,5vw,4rem) 0 5rem}
+.events-hub h1,.events-hub h2,.fixture h3{font-family:Georgia,serif}
+.events-hub h1{font-size:clamp(3rem,7vw,5rem)}
+.events-hub nav{display:flex;flex-wrap:wrap;gap:.65rem;margin:1rem 0 2.5rem}
+.events-hub nav a,.athletics-link{padding:.55rem 1rem;border:1px solid #76528e;border-radius:2rem;font-weight:700}
+.events-hub [aria-current="page"]{background:#ffda70;color:#311642}
+.events-hub h2{font-size:2rem;margin-bottom:1rem}
+.fixtures{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:1rem}
+.fixture{display:flex;align-items:center;gap:1rem;height:100%;padding:1.25rem;border:1px solid #50375f;border-radius:1rem;background:linear-gradient(120deg,#372346,#241c30)}
+.fixture span{display:grid;place-items:center;width:2.7rem;height:2.7rem;flex-shrink:0;border-radius:50%;background:#ffffff0c;color:#ffda70;font-size:1.5rem}
+.fixture h3{font-size:1.35rem}.fixture p{color:#d1c1dc;margin-top:.35rem}.athletics-link{grid-column:1/-1;justify-self:start;color:#ffda70}
+.sport-choice {border-bottom:1px solid #584264;padding:.75rem 0;max-width:58rem}
+.sport-choice summary {cursor:pointer;font-size:1.2rem;font-weight:700;padding:.5rem}
+.sport-choice summary span {display:inline-block;width:2.4rem;color:#ffda70}
+.sport-choice div {display:flex;gap:.75rem;flex-wrap:wrap;padding:.5rem 2.9rem}
+.sport-choice a {color:#ffda70;text-decoration:underline;text-underline-offset:.22rem;padding:.45rem 0}
+
+.calendar-month{margin:1.3rem 0}.calendar-month summary{font-weight:700;cursor:pointer;padding:.65rem 0;color:#ffda78}.calendar-month article{scroll-margin-top:7rem}

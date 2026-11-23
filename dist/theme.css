@@ -1,0 +1,39 @@
+:root[data-theme=light]:not([data-design=original]) {
+  color-scheme:light;
+  --bg:#faf8fc;--bg-2:#f0eaf5;--ink:#271832;--card:white;--line:#d6c8df;--muted:#63536e;
+  --purple:#4b0082;--violet:#612788;--purple-deep:#380062;--gold-soft:#fff1b8;
+}
+:root[data-theme=dark]:not([data-design=original]){
+  color-scheme:dark;
+  --bg:#12101c;--bg-2:#191628;--card:#1d1a2f;--ink:#f2effa;--muted:#bbb4cd;--line:#45394f;--violet:#c1a8fb;
+}
+body>header button[aria-label*="mode"]{display:inline-grid;place-items:center;font:1.4rem/1 system-ui;cursor:pointer}
+@media(min-width:651px){body>header .wrap>.ml-auto{margin-inline-start:auto}}
+[data-theme=light].whs-home body,
+[data-theme=light] #main:has(.events-hub,.athletics){color:var(--ink);background:var(--bg)}
+[data-theme=light] .senior-hub .panel,
+[data-theme=light] .senior-hub .digest:has(#event-list),
+[data-theme=light] .team-card,
+[data-theme=light] .fixture,
+[data-theme=light] #event-list a,
+[data-theme=light] #clock>div{background:var(--card);border-color:var(--line);color:var(--ink)}
+[data-theme=light] .panel-head time,[data-theme=light] .event-info p,
+[data-theme=light] .fixture p,[data-theme=light] .next-fixture{color:var(--muted)}
+[data-theme=light] .fixture-row h4{color:var(--ink)}
+[data-theme=light] .team-poster{color:white}
+[data-theme=light] .panel small,[data-theme=light] .event-info time,[data-theme=light] .event-info strong,
+[data-theme=light] .calendar-month summary,[data-theme=light] .athletics :is(small,summary,nav a){color:var(--purple)}
+[data-theme=light] .team-content details,[data-theme=light] .athletics nav{border-color:var(--line)}
+
+:root[data-theme="dark"] .surface-purple.commencement-card {
+  background:linear-gradient(135deg,#39204e,#23182f);
+  border-color:#614b72;
+  color:#f2effa;
+}
+:root[data-theme="dark"] .commencement-card.surface-purple [class*="bg-white/"] {
+  background:#503862;
+  border-color:#937ba2;
+}
+:root[data-theme="dark"] .commencement-card.surface-purple a[class*="bg-white/"]:hover {
+  background:#644675;
+}

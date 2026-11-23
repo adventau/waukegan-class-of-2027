@@ -1,0 +1,99 @@
+const dates = [
+  ['2026-11-25','Thanksgiving recess','/announcements/no-school-days-this-fall','2026-11-27'],
+  ['2026-12-21','Winter break','/events/winter-break-2026','2027-01-01'],
+  ['2027-03-22','Spring break','/events/spring-break-2027','2027-03-26'],
+  ['2027-05-27','Last day of classes','/events/last-day-of-classes-2027']
+];
+const games = [
+  [
+    "2026-11-23",
+    "Bulldogs at Leyden",
+    "/sports/#game-2026-11-23",
+    "Boys varsity basketball \u00b7 5:30 PM"
+  ],
+  [
+    "2026-11-24",
+    "Bulldogs vs. Dyett",
+    "/sports/#game-2026-11-24",
+    "Boys varsity basketball \u00b7 5:30 PM"
+  ],
+  [
+    "2026-11-25",
+    "Bulldogs at St. Patrick",
+    "/sports/#game-2026-11-25",
+    "Boys varsity basketball \u00b7 7:00 PM"
+  ],
+  [
+    "2026-12-01",
+    "Bulldogs at Warren Township",
+    "/sports/#game-2026-12-01",
+    "Girls varsity basketball \u00b7 7:00 PM"
+  ],
+  [
+    "2026-12-09",
+    "Bulldogs vs. Mundelein",
+    "/sports/#game-2026-12-09",
+    "Girls varsity basketball \u00b7 5:30 PM"
+  ],
+  [
+    "2026-12-18",
+    "Bulldogs at Libertyville",
+    "/sports/#game-2026-12-18",
+    "Girls varsity basketball \u00b7 7:00 PM"
+  ]
+];
+const posters = ['❧','❄','✿','✦'];
+const descriptions = ['Thanksgiving recess runs November 25–27.', 'Winter break runs December 21 through January 1.', 'Spring break runs March 22–26.', 'The final day of the 2026–27 school year.'];
+const dayFormat = new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Chicago'});
+const longDate = new Intl.DateTimeFormat('en-US',{weekday:'long', month:'long', day:'numeric',year:'numeric',timeZone:'America/Chicago'});
+let renderedDay = '';
+let target = 0;
+function escapeText(value) {
+  const node = document.createElement('span');
+  node.textContent = value;
+  return node.innerHTML;
+}
+function updateCalendar(now, today) {
+  const upcoming = [...schoolCalendar, ...games].filter(([start]) => start >= today).sort((a,b) => a[0].localeCompare(b[0]));
+  const nextBreak = dates.find(event => event[3] && event[3] >= today);
+  const active = nextBreak && nextBreak[0] <= today;
+  document.querySelector('#break-name').textContent = nextBreak ? (active ? 'On break · ' : 'Countdown to ') + nextBreak[1] : 'Next break dates pending';
+  const clock = document.querySelector('#clock');
+  clock.hidden = !nextBreak || active;
+  document.querySelector('#break-date').textContent = nextBreak ? longDate.format(new Date(nextBreak[0]+'T12:00:00Z')) : '';
+  if (nextBreak) {
+    const noon = new Date(nextBreak[0]+'T12:00:00Z');
+    const hour = Number(new Intl.DateTimeFormat('en-US',{hour:'numeric',hourCycle:'h23',timeZone:'America/Chicago'}).format(noon));
+    target = noon.getTime() - hour * 3600000;
+  }
+  const list = document.querySelector('#event-list');
+  list.replaceChildren();
+  for (const event of upcoming.slice(0,3)) {
+    const [start,title,url] = event;
+    const i = new Date(start).getUTCMonth() % 4;
+    const isGame = games.includes(event);
+    const card = document.createElement('a');
+    card.href = url;
+    card.innerHTML = '<div class="poster tone-'+i+'" aria-hidden="true"><i>'+(isGame ? '🏀' : '◇')+'</i><b>'+escapeText(title)+'</b></div><div class="event-info"><time datetime="'+start+'">'+longDate.format(new Date(start+'T12:00:00Z'))+'</time><h3>'+escapeText(title)+'</h3><p>'+escapeText(event[3] || '')+'</p><strong>View details</strong></div>';
+    list.append(card);
+  }
+  if (!upcoming.length) list.textContent = 'New event dates are pending.';
+}
+function tick() {
+  const now = new Date();
+  const today = dayFormat.format(now);
+  if (today !== renderedDay) { updateCalendar(now,today); renderedDay = today; }
+  const seconds = Math.max(0,Math.floor((target-now.getTime())/1000));
+  const values = [Math.floor(seconds/86400),Math.floor(seconds/3600)%24,Math.floor(seconds/60)%60,seconds%60];
+  document.querySelectorAll('#clock b').forEach((cell,i) => {cell.textContent = String(values[i]).padStart(2,'0');});
+}
+tick();
+setInterval(tick,1000);
+const welcome = document.querySelector('#welcome');
+let seen = false;
+try { seen = localStorage.getItem('whs-welcome-complete') === 'yes'; } catch {}
+if (!seen) welcome.showModal();
+welcome.addEventListener('cancel', event => event.preventDefault());
+welcome.addEventListener('close', () => {
+  try { localStorage.setItem('whs-welcome-complete','yes'); } catch {}
+});

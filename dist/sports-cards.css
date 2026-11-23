@@ -1,0 +1,23 @@
+#main:has(.athletics){color:#f8f4fd;background:radial-gradient(ellipse at 10% 0%,#362445,transparent 35rem),#131019}
+.athletics{width:min(92%,66rem);margin:auto;padding:3rem 0 5rem}
+.sports-title{display:flex;align-items:center;gap:1.3rem}.sports-title img{width:clamp(4rem,9vw,6rem);border-radius:50%}
+.athletics small{display:block;color:#ffd972;font-size:.82rem;font-weight:bold;letter-spacing:.1em;text-transform:uppercase}
+.sports-title h1,.athletics h2,.fixture-row h4{font:normal clamp(2.6rem,6vw,5rem)/1.12 Georgia,serif}
+.athletics nav{display:flex;gap:1.4rem;margin:1.65rem 0;border-bottom:1px solid #503f59;padding-bottom:1rem}.athletics nav a,.athletics summary{color:#ffda78;font-weight:700;cursor:pointer}
+.athletics section{scroll-margin-top:5rem;margin-top:2.5rem}.athletics h2{font-size:2.15rem;margin-bottom:1rem}
+.team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;align-items:start}
+.team-card{border-radius:1.1rem;border:1px solid #55405f;overflow:hidden;background:#231c30}
+.team-poster{display:flex;align-items:flex-end;position:relative;isolation:isolate;overflow:hidden;min-height:6.8rem;padding:1.25rem;background:linear-gradient(32deg,transparent 38%,#e4be412b 38% 45%,transparent 45%),linear-gradient(110deg,#5c3473,#35214e)}
+.team-poster span{position:absolute;right:1rem;top:.2rem;font-size:4rem;opacity:.5;color:#ffd777}
+.team-poster h3{z-index:1;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:1.35rem}
+.team-content{padding:1.15rem 1.25rem 1.4rem}.next-fixture{margin-top:.55rem;color:#d6cadd}
+.fixture-row h4{color:white;font-size:1.55rem;margin-bottom:.4rem}.fixture-row time,.fixture-row p{display:block;font-size:.95rem}
+.team-content details{margin-top:1rem;border-top:1px solid #503c5b;padding-top:.7rem}.team-content details .fixture-row{margin-top:.85rem}
+@media(max-width:560px){.team-grid{grid-template-columns:1fr}.athletics{padding-top:1.75rem}.team-poster{min-height:5.8rem}}
+
+.team-poster{min-height:8rem;padding-top:3.75rem}
+.team-poster span{top:auto;bottom:-.7rem;right:1rem;pointer-events:none}
+.level-picker{position:absolute;right:.85rem;top:.7rem;color:#fff;background:#30203e;border:1px solid #ab8fb7;border-radius:.6rem;padding:.4rem .55rem;font:600 .9rem/1.25 system-ui;cursor:pointer}
+.level-picker:focus-visible{outline:3px solid #ffd777;outline-offset:2px}
+.team-content{padding:1.4rem 1.25rem 1.65rem}
+.fixture-row time,.fixture-row p{margin-top:.4rem;line-height:1.45}

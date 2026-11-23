@@ -1,0 +1,5 @@
+.grad-clock {margin-top:1.5rem;color:var(--ink)}
+.grad-clock h3 {font-weight:700;margin-bottom:.6rem}
+.grad-clock [role=timer] {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.4rem;max-width:32rem}
+.grad-clock span {text-align:center;padding:.65rem .1rem;background:var(--card);border:1px solid var(--line);border-radius:.6rem;color:var(--muted);font-size:.85rem}
+.grad-clock b {display:block;color:var(--ink);font:600 clamp(1.35rem,4vw,2rem)/1.2 Georgia,serif;font-variant-numeric:tabular-nums}

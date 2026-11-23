@@ -1,0 +1,18 @@
+details .local-schedules{display:grid;padding:1rem;gap:1.25rem}
+.local-schedules h3{color:#ffda70;margin-bottom:.4rem}
+.game-line{display:flex;align-items:baseline;flex-wrap:wrap;gap:.4rem 1rem;padding:.6rem 0;border-bottom:1px solid #4a3758}
+.game-line time,.game-line span{color:#dacfe1}
+.game-line:target{background:#482659}
+@media(max-width:410px){body>header .leading-tight{max-width:5.25rem}}
+
+body>header>.wrap {position:relative;justify-content:center;gap:clamp(.5rem,2vw,1.5rem);height:3.5rem;padding-inline:1rem}
+body>header .ml-auto {margin-left:0}
+.header-links {display:flex;align-items:center;gap:1rem;font-size:.92rem;font-weight:650}
+.center-menu {position:relative;flex:none}
+.center-menu .demo-menu {left:auto;right:0;top:calc(100% + .5rem);width:min(18rem,90vw);max-height:70dvh;overflow:auto}
+@media(max-width:650px){
+ .header-links{display:none}
+ body>header>.wrap{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+ body>header .ml-auto{justify-self:end}
+ .center-menu .demo-menu{left:50%;right:auto;transform:translateX(-50%)}
+}

@@ -1,0 +1,8 @@
+# Not part of the website
+my-rebuild-dist/
+build/
+raw/
+gen_data.py
+mp_extract.py
+.claude/
+.DS_Store
