@@ -4,14 +4,14 @@ pages_build_output_dir = "dist"
 compatibility_date = "2026-11-01"
 
 # Database for form submissions, visits, switches and edited content.
-# database_id is filled in when the real database is created on Cloudflare.
+# Created on Cloudflare on 2026-11-23.
 [[d1_databases]]
 binding = "DB"
 database_name = "whs2027"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "af6ba9bc-4bc5-4134-88f0-c0ecd01ba0a1"
 migrations_dir = "migrations"
 
-# Storage for uploaded photos. id is filled in when it is created on Cloudflare.
+# Storage for uploaded photos (KV namespace "whs2027-files").
 [[kv_namespaces]]
 binding = "FILES"
-id = "00000000000000000000000000000000"
+id = "4a5b75fdc5ca43bd8f4cf1ad88e9edba"
