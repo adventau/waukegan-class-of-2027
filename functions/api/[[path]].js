@@ -83,7 +83,9 @@ async function submit({ request, env }, type) {
   const switches = await getSwitches(env);
   if (!switches.forms[type]) return json({ error: 'This form is closed right now. Please check back later.' }, 403);
   const key = await ipKey(request, env);
-  if (await rateLimited(env, 'sub:' + key, 15, 3600000)) return json({ error: 'Too many submissions from this device. Please try again in an hour.' }, 429);
+  // Photos come one request per photo, so they get a much higher allowance than the other forms.
+  const perHour = type === 'photo' ? 300 : 15;
+  if (await rateLimited(env, 'sub:' + key, perHour, 3600000)) return json({ error: 'Too many submissions from this device. Please try again in an hour.' }, 429);
   const len = Number(request.headers.get('content-length') || 0);
   if (len > MAX_UPLOAD + 200000) return json({ error: 'That file is too big. Photos can be up to 10MB.' }, 413);
   const form = await request.formData().catch(() => null);

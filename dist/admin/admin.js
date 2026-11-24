@@ -89,10 +89,23 @@ views.photos = async () => {
   const { items } = await call('/api/admin/submissions?type=photo&status=' + photoStatus);
   panel.innerHTML = `<div class="row between" style="margin-bottom:14px"><h1 style="margin:0">Photos</h1>
     <div class="seg" role="group" aria-label="Show">${[['pending', 'Waiting'], ['approved', 'On the site'], ['rejected', 'Rejected']].map(([k, l]) => `<button type="button" data-st="${k}" aria-pressed="${k === photoStatus}">${l}</button>`).join('')}</div></div>
+    ${photoStatus === 'pending' && items.length > 1 ? `<div class="row" style="margin-bottom:10px"><button class="btn green" id="approve-all">✓ Approve all ${items.length}</button></div>` : ''}
     <p class="muted">${photoStatus === 'pending' ? 'Approve a photo to put it on the Photos page and homepage. Rejecting deletes the file.' : photoStatus === 'approved' ? 'These are live on the site. “Take down” removes the photo and deletes the file.' : 'Rejected photo files are already deleted. Only the form details are kept until you delete them.'}</p>
     ${items.length ? `<div class="grid g2">${items.map(photoCard).join('')}</div>` : `<div class="empty">${photoStatus === 'pending' ? 'No photos waiting for review.' : 'Nothing here yet.'}</div>`}`;
   $$('[data-st]').forEach((b) => b.addEventListener('click', () => { photoStatus = b.dataset.st; views.photos().catch(fail); }));
   $$('[data-act]').forEach((b) => b.addEventListener('click', () => act(b, views.photos)));
+  $('#approve-all')?.addEventListener('click', async (e) => {
+    if (!confirm(`Approve all ${items.length} photos? They'll all go on the site.`)) return;
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    let done = 0;
+    for (const it of items) {
+      btn.textContent = `Approving ${done + 1} of ${items.length}…`;
+      try { await call('/api/admin/submissions/' + it.id, { method: 'POST', body: { action: 'approve' } }); done++; } catch (err) { fail(err); break; }
+    }
+    toast(`Approved ${done} photo${done === 1 ? '' : 's'}`);
+    views.photos().catch(fail);
+  });
   refreshCounts().catch(() => {});
 };
 function photoCard(it) {

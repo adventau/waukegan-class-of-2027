@@ -68,51 +68,82 @@
     status.setAttribute('role', 'status');
     status.setAttribute('aria-live', 'polite');
     form.append(status);
+    const MAX = 10 * 1024 * 1024;
+    const showFieldErrors = (out) => {
+      let first = null;
+      for (const [name, msg] of Object.entries(out.fields || {})) {
+        const field = form.querySelector(`[name="${CSS.escape(name)}"]`);
+        if (!field) continue;
+        field.setAttribute('aria-invalid', 'true');
+        const p = document.createElement('p');
+        p.className = 'live-field-error';
+        p.textContent = msg;
+        (field.closest('label') || field).after(p);
+        first ||= field;
+      }
+      first?.focus();
+    };
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       form.querySelectorAll('.live-field-error').forEach((n) => n.remove());
       form.querySelectorAll('[aria-invalid]').forEach((n) => n.removeAttribute('aria-invalid'));
-      const file = form.querySelector('input[type=file]')?.files?.[0];
-      if (file && file.size > 10 * 1024 * 1024) { status.className = 'live-form-status bad'; status.textContent = 'That file is too big. Photos can be up to 10MB.'; return; }
+      const fileInput = form.querySelector('input[type=file]');
+      const files = [...(fileInput?.files || [])];
+      const tooBig = files.filter((f) => f.size > MAX);
+      if (tooBig.length) {
+        status.className = 'live-form-status bad';
+        status.textContent = (tooBig.length === 1 ? `“${tooBig[0].name}” is` : `${tooBig.length} of your photos are`) + ' over 10MB. Please remove ' + (tooBig.length === 1 ? 'it' : 'them') + ' or pick smaller copies.';
+        return;
+      }
       const button = form.querySelector('button[type=submit]');
       const label = button?.textContent;
-      if (button) { button.disabled = true; button.textContent = 'Sending…'; }
+      if (button) button.disabled = true;
       status.className = 'live-form-status';
       status.textContent = '';
+      // Several photos are sent one at a time, so there's no limit on how many you can pick.
+      const many = files.length > 1;
+      const rounds = many ? files : [null];
+      let sent = 0;
+      const failed = [];
       try {
-        const res = await fetch('/api/submit/' + type, { method: 'POST', body: new FormData(form) });
-        const out = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          status.className = 'live-form-status bad';
-          status.textContent = out.error || 'Something went wrong. Please try again.';
-          let first = null;
-          for (const [name, msg] of Object.entries(out.fields || {})) {
-            const field = form.querySelector(`[name="${CSS.escape(name)}"]`);
-            if (!field) continue;
-            field.setAttribute('aria-invalid', 'true');
-            const p = document.createElement('p');
-            p.className = 'live-field-error';
-            p.textContent = msg;
-            (field.closest('label') || field).after(p);
-            first ||= field;
+        for (let i = 0; i < rounds.length; i++) {
+          const body = new FormData(form);
+          if (many) {
+            body.delete(fileInput.name);
+            body.append(fileInput.name, rounds[i]);
+            status.textContent = `Uploading photo ${i + 1} of ${rounds.length}…`;
           }
-          first?.focus();
-          return;
+          if (button) button.textContent = many ? `Uploading ${i + 1} of ${rounds.length}…` : 'Sending…';
+          const res = await fetch('/api/submit/' + type, { method: 'POST', body });
+          const out = await res.json().catch(() => ({}));
+          if (res.ok) { sent++; continue; }
+          const otherFieldErrors = Object.keys(out.fields || {}).some((k) => !fileInput || k !== fileInput.name);
+          if (!many || otherFieldErrors || res.status === 429 || res.status === 403 || !out.fields) {
+            // A problem with the form itself (or the server said stop): show it and stop here.
+            status.className = 'live-form-status bad';
+            status.textContent = (sent ? `${sent} photo${sent === 1 ? ' was' : 's were'} sent, then this happened: ` : '') + (out.error || 'Something went wrong. Please try again.');
+            showFieldErrors(out);
+            return;
+          }
+          failed.push(`${rounds[i].name} (${out.fields[fileInput.name] || 'could not be uploaded'})`);
         }
-        form.reset();
-        status.className = 'live-form-status good';
-        status.textContent = {
-          photo: 'Thanks! Your photo is in. The site team reviews every photo before it goes on the site.',
+        if (!failed.length) form.reset();
+        status.className = 'live-form-status ' + (failed.length && !sent ? 'bad' : 'good');
+        const thanks = {
+          photo: sent > 1 ? `Thanks! All ${sent} photos are in. The site team reviews every photo before it goes on the site.` : 'Thanks! Your photo is in. The site team reviews every photo before it goes on the site.',
           spotlight: 'Thanks! Your nomination is in. We always ask the senior before featuring them.',
           directory: 'Thanks! You’ll appear in the directory once a moderator approves your entry.',
           announcement: 'Thanks! An editor will read your request before anything is posted.',
           contact: 'Thanks! Your message was sent. A real senior will reply, usually within a few school days.',
           newsletter: 'You’re on the list. Emails start when notifications launch.',
         }[type] || 'Thanks! Sent.';
+        status.textContent = failed.length
+          ? `${sent} of ${rounds.length} photos were sent. These didn’t upload: ${failed.join('; ')}.`
+          : thanks;
         status.scrollIntoView({ block: 'nearest' });
       } catch {
         status.className = 'live-form-status bad';
-        status.textContent = 'We could not reach the server. Check your connection and try again.';
+        status.textContent = (sent ? `${sent} photo${sent === 1 ? ' was' : 's were'} sent, but then ` : '') + 'we could not reach the server. Check your connection and try again.';
       } finally {
         if (button) { button.disabled = false; button.textContent = label; }
       }
