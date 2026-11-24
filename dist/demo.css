@@ -239,7 +239,7 @@
 .class-lockup img {width:clamp(4rem,10vw,9rem);height:auto;border-radius:50%}
 @media(prefers-reduced-motion:no-preference){.class-lockup img {animation:bulldog-tilt 2.2s ease-in-out 1}@keyframes bulldog-tilt{0%,100%{transform:rotate(0)}35%{transform:rotate(-4deg)}70%{transform:rotate(2deg)}}}
 .whs-home .break-box {position:relative;isolation:isolate;overflow:hidden}
-.break-box::before {content:"";position:absolute;z-index:-1;inset:0;background:url('/images/bulldog-logo.webp') 85% 38%/auto 145% no-repeat;opacity:.09;pointer-events:none}
+
 .whs-home .senior-hub .grid-cols-4 {grid-template-columns:repeat(3,minmax(0,1fr))}
 .whs-home .senior-hub .grid-cols-4 > .card {flex-direction:column;gap:.55rem;padding:1rem .3rem;background:linear-gradient(145deg,#432367b8,#2b184bb3)}
 .whs-home .grid-cols-4 > .card > span:first-child {width:3rem;height:3rem;background:#ffe1a419;color:#ffda70}
