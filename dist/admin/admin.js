@@ -39,7 +39,7 @@ const views = {};
 function show() {
   const tab = (location.hash.slice(1) || 'overview').split('/')[0];
   $$('.tabs a').forEach((a) => (a.dataset.tab === tab ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
-  panel.innerHTML = '<p class="muted">loading…</p>';
+  panel.innerHTML = '<p class="muted">Loading…</p>';
   (views[tab] || views.overview)().catch(fail);
 }
 addEventListener('hashchange', show);
@@ -58,19 +58,19 @@ async function refreshCounts() {
 views.overview = async () => {
   const { o, n } = await refreshCounts();
   const allOk = Object.values(o.checks).every((c) => c.ok);
-  panel.innerHTML = `<h1>system.overview</h1>
+  panel.innerHTML = `<h1>Overview</h1>
   <div class="grid g4" style="margin:16px 0">
-    <a class="card stat" href="#photos" style="text-decoration:none;color:inherit"><b>${n('photo', ['pending'])}</b>photos in queue</a>
-    <a class="card stat" href="#inbox" style="text-decoration:none;color:inherit"><b>${o.counts.filter((c) => c.type !== 'photo' && ['pending', 'new'].includes(c.status)).reduce((a, c) => a + c.n, 0)}</b>new inbox items</a>
-    <a class="card stat" href="#visits" style="text-decoration:none;color:inherit"><b>${o.visitsToday}</b>page hits today</a>
-    <a class="card stat" href="#errors" style="text-decoration:none;color:inherit"><b>${o.errors24h}</b>errors / 24h</a>
+    <a class="card stat" href="#photos" style="text-decoration:none;color:inherit"><b>${n('photo', ['pending'])}</b>Photos to review</a>
+    <a class="card stat" href="#inbox" style="text-decoration:none;color:inherit"><b>${o.counts.filter((c) => c.type !== 'photo' && ['pending', 'new'].includes(c.status)).reduce((a, c) => a + c.n, 0)}</b>Inbox · new</a>
+    <a class="card stat" href="#visits" style="text-decoration:none;color:inherit"><b>${o.visitsToday}</b>Page views today</a>
+    <a class="card stat" href="#errors" style="text-decoration:none;color:inherit"><b>${o.errors24h}</b>Errors · 24h</a>
   </div>
   <div class="card stack">
-    <div class="row between"><h2 style="margin:0">diagnostics</h2><span class="pill ${allOk ? 'ok' : 'bad'}">${allOk ? 'all systems go' : 'attention needed'}</span></div>
+    <div class="row between"><h2 style="margin:0">System status</h2><span class="pill ${allOk ? 'ok' : 'bad'}">${allOk ? 'All systems operational' : 'Needs attention'}</span></div>
     ${statusRows(o)}
   </div>
   <div class="card stack" style="margin-top:14px">
-    <h2 style="margin:0">quick commands</h2>
+    <h2 style="margin:0">Shortcuts</h2>
     <div class="row"><a class="btn" href="#switches">Turn things on or off</a><a class="btn" href="#content/news">Write a news post</a><a class="btn" href="#content/events">Edit events</a><a class="btn" href="/" target="_blank" rel="noopener">Open the site ↗</a></div>
   </div>`;
 };
@@ -87,10 +87,10 @@ function statusRows(o) {
 let photoStatus = 'pending';
 views.photos = async () => {
   const { items } = await call('/api/admin/submissions?type=photo&status=' + photoStatus);
-  panel.innerHTML = `<div class="row between" style="margin-bottom:14px"><h1 style="margin:0">photos.queue</h1>
+  panel.innerHTML = `<div class="row between" style="margin-bottom:14px"><h1 style="margin:0">Photos</h1>
     <div class="seg" role="group" aria-label="Show">${[['pending', 'Waiting'], ['approved', 'On the site'], ['rejected', 'Rejected']].map(([k, l]) => `<button type="button" data-st="${k}" aria-pressed="${k === photoStatus}">${l}</button>`).join('')}</div></div>
     <p class="muted">${photoStatus === 'pending' ? 'Approve a photo to put it on the Photos page and homepage. Rejecting deletes the file.' : photoStatus === 'approved' ? 'These are live on the site. “Take down” removes the photo and deletes the file.' : 'Rejected photo files are already deleted. Only the form details are kept until you delete them.'}</p>
-    ${items.length ? `<div class="grid g2">${items.map(photoCard).join('')}</div>` : `<div class="empty">${photoStatus === 'pending' ? 'queue empty. no photos waiting.' : 'Nothing here yet.'}</div>`}`;
+    ${items.length ? `<div class="grid g2">${items.map(photoCard).join('')}</div>` : `<div class="empty">${photoStatus === 'pending' ? 'No photos waiting for review.' : 'Nothing here yet.'}</div>`}`;
   $$('[data-st]').forEach((b) => b.addEventListener('click', () => { photoStatus = b.dataset.st; views.photos().catch(fail); }));
   $$('[data-act]').forEach((b) => b.addEventListener('click', () => act(b, views.photos)));
   refreshCounts().catch(() => {});
@@ -125,7 +125,7 @@ views.inbox = async () => {
   const open = items.filter((i) => ['pending', 'new'].includes(i.status));
   const shown = inboxOpen ? open : items.filter((i) => !['pending', 'new'].includes(i.status));
   const review = !['contact', 'newsletter'].includes(inboxType);
-  panel.innerHTML = `<h1>inbox</h1>
+  panel.innerHTML = `<h1>Inbox</h1>
     <div class="row between" style="margin-bottom:14px">
       <div class="seg" role="group" aria-label="Type">${kinds.map((k) => `<button type="button" data-k="${k}" aria-pressed="${k === inboxType}">${{ contact: 'Messages', spotlight: 'Nominations', directory: 'Directory', announcement: 'Announcement requests', newsletter: 'Email sign-ups' }[k]}</button>`).join('')}</div>
       <div class="seg" role="group" aria-label="Show"><button type="button" data-o="1" aria-pressed="${inboxOpen}">New (${open.length})</button><button type="button" data-o="0" aria-pressed="${!inboxOpen}">Handled</button></div>
@@ -155,7 +155,7 @@ views.visits = async () => {
   const max = Math.max(1, ...days.map((d) => map[d] || 0));
   const total = days.reduce((a, d) => a + (map[d] || 0), 0);
   const topMax = Math.max(1, ...v.pages.map((p) => p.n));
-  panel.innerHTML = `<div class="row between" style="margin-bottom:14px"><h1 style="margin:0">traffic.log</h1>
+  panel.innerHTML = `<div class="row between" style="margin-bottom:14px"><h1 style="margin:0">Traffic</h1>
     <div class="seg" role="group" aria-label="Range">${[7, 30, 90].map((d) => `<button type="button" data-d="${d}" aria-pressed="${d === visitDays}">${d} days</button>`).join('')}</div></div>
     <div class="card"><div class="row between"><h2 style="margin:0">${total.toLocaleString()} page visits</h2><span class="muted small">last ${v.days} days</span></div>
     <div class="chart" role="img" aria-label="Visits per day">${days.map((d) => `<div style="height:${Math.max(2, ((map[d] || 0) / max) * 100)}%" data-tip="${day(d)}: ${map[d] || 0}"></div>`).join('')}</div>
@@ -169,7 +169,7 @@ views.visits = async () => {
 views.switches = async () => {
   const s = await call('/api/admin/settings');
   const sw = (id, label, help, on) => `<label class="switch" for="${id}"><span><b>${label}</b><br><span class="muted small">${help}</span></span><input type="checkbox" id="${id}" ${on ? 'checked' : ''}></label>`;
-  panel.innerHTML = `<h1>switches</h1><p class="muted">Flip a switch, then press <b>Save</b>. Changes show up on the site within a minute.</p>
+  panel.innerHTML = `<h1>Switches</h1><p class="muted">Flip a switch, then press <b>Save</b>. Changes show up on the site within a minute.</p>
   <form id="swf" class="stack">
     <div class="card"><h2>Announcement banner</h2>
       ${sw('banner', 'Show a banner at the top of every page', 'A gold strip under the menu, for big news like “Prom tickets on sale”.', s.banner)}
@@ -212,7 +212,7 @@ async function current(key, file, expr) {
 }
 views.content = async () => {
   const sub = location.hash.split('/')[1] || 'news';
-  panel.innerHTML = `<h1>content.edit</h1><div class="seg" role="group" aria-label="What to edit" style="margin-bottom:16px">
+  panel.innerHTML = `<h1>Content</h1><div class="seg" role="group" aria-label="What to edit" style="margin-bottom:16px">
     ${[['news', 'News posts'], ['events', 'Events'], ['games', 'Game schedules'], ['breaks', 'School breaks']].map(([k, l]) => `<button type="button" data-sub="${k}" aria-pressed="${k === sub}">${l}</button>`).join('')}</div><div id="sub"><p class="muted">Loading…</p></div>`;
   $$('[data-sub]').forEach((b) => b.addEventListener('click', () => { location.hash = 'content/' + b.dataset.sub; }));
   await ({ news, events, games, breaks }[sub] || news)($('#sub'));
@@ -334,11 +334,11 @@ async function breaks(box) {
 // ---------------- Status & errors ----------------
 views.errors = async () => {
   const [o, { items }] = await Promise.all([call('/api/admin/overview'), call('/api/admin/errors')]);
-  panel.innerHTML = `<h1>status &amp; logs</h1>
+  panel.innerHTML = `<h1>Status &amp; logs</h1>
     <div class="card stack">${statusRows(o)}</div>
     <div class="card" style="margin-top:14px"><div class="row between"><h2 style="margin:0">Recent errors (${items.length})</h2>${items.length ? '<button class="btn" id="clr">Clear all</button>' : ''}</div>
     <p class="muted small">“Browser” errors happened on a visitor’s phone or computer. “Server” errors happened on the site’s server. A few now and then is normal.</p>
-    ${items.length ? items.map((e) => `<div style="padding:10px 0;border-top:1px solid var(--line)"><div class="row between"><span><span class="pill ${e.source === 'server' ? 'bad' : 'gold'}">${esc(e.source)}</span> <b>${esc(e.message)}</b></span><span class="muted small">${when(e.at)}</span></div><p class="muted small" style="margin:4px 0 0">Page: ${esc(e.path || '—')}</p>${e.detail ? `<details><summary class="small">Technical details</summary><pre class="err">${esc(e.detail)}</pre></details>` : ''}</div>`).join('') : '<div class="empty">no errors logged</div>'}</div>`;
+    ${items.length ? items.map((e) => `<div style="padding:10px 0;border-top:1px solid var(--line)"><div class="row between"><span><span class="pill ${e.source === 'server' ? 'bad' : 'gold'}">${esc(e.source)}</span> <b>${esc(e.message)}</b></span><span class="muted small">${when(e.at)}</span></div><p class="muted small" style="margin:4px 0 0">Page: ${esc(e.path || '—')}</p>${e.detail ? `<details><summary class="small">Technical details</summary><pre class="err">${esc(e.detail)}</pre></details>` : ''}</div>`).join('') : '<div class="empty">No errors logged.</div>'}</div>`;
   $('#clr')?.addEventListener('click', async () => { if (!confirm('Clear the error list?')) return; try { await call('/api/admin/errors', { method: 'DELETE' }); toast('Cleared'); views.errors(); } catch (e) { fail(e); } });
   refreshCounts().catch(() => {});
 };
