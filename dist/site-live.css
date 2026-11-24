@@ -1,0 +1,25 @@
+/* Styles for server-connected parts: banner, form messages, photo viewer, and admin on/off switches. */
+html.sw-off-countdown [data-sw="countdown"],
+html.sw-off-events [data-sw="events"],
+html.sw-off-photos [data-sw="photos"],
+html.sw-off-spotlight [data-sw="spotlight"] { display: none !important; }
+
+.site-banner { background: #ffd700; color: #24123a; text-align: center; font-weight: 700; font-size: .95rem; padding: .6rem 1rem; }
+.site-banner a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+.live-form-status:empty { display: none; }
+.live-form-status { margin-top: 1rem; padding: .85rem 1rem; border-radius: .75rem; font-weight: 600; background: var(--card, #fff); border: 1px solid var(--line, #ccc); }
+.live-form-status.good { border-color: #008c45; background: rgba(0, 140, 69, .12); }
+.live-form-status.bad { border-color: #c2410c; background: rgba(194, 65, 12, .12); }
+.live-field-error { color: #ea580c; font-size: .85rem; font-weight: 700; margin-top: .35rem; }
+[data-theme="light"] .live-field-error { color: #b42318; }
+[aria-invalid="true"] { outline: 2px solid #ea580c; outline-offset: 1px; }
+.live-form-closed { margin-bottom: 1rem; padding: .85rem 1rem; border-radius: .75rem; background: rgba(255, 215, 0, .15); border: 1px solid rgba(255, 215, 0, .5); font-weight: 700; }
+
+.live-lightbox { margin: auto; border: 0; padding: 0; max-width: min(94vw, 1000px); width: 100%; border-radius: 1.25rem; background: var(--card, #1d1a2f); color: var(--ink, #fff); overflow: hidden; }
+.live-lightbox::backdrop { background: rgba(10, 6, 18, .75); }
+.live-lightbox img { display: block; width: 100%; max-height: 64vh; object-fit: contain; background: #000; }
+.live-lightbox-text { padding: 1rem 1.25rem 1.25rem; display: grid; gap: .4rem; }
+.live-lightbox-text .muted { color: var(--muted, #888); font-size: .9rem; }
+.live-lightbox-text .btn-outline { justify-self: start; margin-top: .4rem; }
+.live-lightbox-close { position: absolute; top: .5rem; right: .6rem; width: 44px; height: 44px; border-radius: 999px; border: 0; background: rgba(0, 0, 0, .55); color: #fff; font-size: 1.6rem; cursor: pointer; }

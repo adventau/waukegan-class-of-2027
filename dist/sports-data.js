@@ -1,4 +1,4 @@
-const teamFixtures = {
+var teamFixtures = {
   "Boys-Basketball": [
     [
       "2026-11-23",
@@ -65,7 +65,7 @@ const teamFixtures = {
   ]
 };
 
-const jvFixtures = {
+var jvFixtures = {
   "Boys-Basketball": [
     [
       "2026-12-05",

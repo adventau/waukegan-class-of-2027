@@ -6,3 +6,7 @@ gen_data.py
 mp_extract.py
 .claude/
 .DS_Store
+node_modules/
+.wrangler/
+.dev.vars
+ADMIN-PASSWORD.txt

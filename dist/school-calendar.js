@@ -1,5 +1,5 @@
 // Snapshot of the official WHS School Events calendar, November 20, 2026.
-const schoolCalendar = [
+var schoolCalendar = [
   [
     "2026-11-20",
     "JROTC JLAB Academic Bowl @ Trapp Auditorium",

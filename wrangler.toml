@@ -1,0 +1,17 @@
+# Cloudflare Pages settings for WHS2027.com
+name = "whs2027"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-11-01"
+
+# Database for form submissions, visits, switches and edited content.
+# database_id is filled in when the real database is created on Cloudflare.
+[[d1_databases]]
+binding = "DB"
+database_name = "whs2027"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+# Storage for uploaded photos. id is filled in when it is created on Cloudflare.
+[[kv_namespaces]]
+binding = "FILES"
+id = "00000000000000000000000000000000"

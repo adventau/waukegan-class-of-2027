@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · WHS Class of 2027</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/admin/admin.css">
+<script defer src="/admin/admin.js"></script>
+</head>
+<body>
+<a class="skip" href="#panel">Skip to content</a>
+<header class="top">
+  <a class="brand" href="/admin/"><img src="/images/bulldog-logo.webp" alt=""><span><b>WHS2027 Admin</b><small>Only you can see this page</small></span></a>
+  <div class="top-actions">
+    <a class="btn ghost" href="/" target="_blank" rel="noopener">View site ↗</a>
+    <button class="btn ghost" id="logout" type="button">Sign out</button>
+  </div>
+</header>
+<div class="layout">
+  <nav class="tabs" aria-label="Admin sections">
+    <a href="#overview" data-tab="overview">🏠 Overview</a>
+    <a href="#photos" data-tab="photos">📷 Photos <span class="count" data-count="photo"></span></a>
+    <a href="#inbox" data-tab="inbox">📥 Inbox <span class="count" data-count="inbox"></span></a>
+    <a href="#visits" data-tab="visits">📈 Visits</a>
+    <a href="#switches" data-tab="switches">🎛️ Switches</a>
+    <a href="#content" data-tab="content">✏️ Content</a>
+    <a href="#errors" data-tab="errors">🩺 Status &amp; errors <span class="count warn" data-count="errors"></span></a>
+  </nav>
+  <main id="panel" tabindex="-1" aria-live="polite"><p class="muted">Loading…</p></main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

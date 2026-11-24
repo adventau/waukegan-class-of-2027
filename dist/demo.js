@@ -49,7 +49,7 @@ document.querySelectorAll('header button[aria-haspopup],header button[aria-label
     }
   });
 });
-document.querySelectorAll('[data-demo-form]').forEach(form => {
+document.querySelectorAll('[data-demo-form]:not([data-live-form])').forEach(form => {
   form.addEventListener('submit', event => event.preventDefault());
   form.querySelectorAll('input, textarea, select, button').forEach(control => {control.disabled = true});
 });
