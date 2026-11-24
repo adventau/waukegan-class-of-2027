@@ -9,7 +9,7 @@ import { CONTENT_KEYS } from '../../lib/content.js';
 const parse = (s) => { try { return JSON.parse(s); } catch { return {}; } };
 const publicPhoto = (r) => {
   const d = parse(r.data);
-  return { id: r.id, caption: d.caption || '', credit: d.credit || d.name || '', event: d.event_slug || '', download: !!d.allow_download, date: r.reviewed_at || r.created_at, type: r.file_type };
+  return { id: r.id, caption: d.caption || '', credit: d.credit || d.name || '', event: d.event_slug || '', eventName: d.event_slug === 'other' ? (d.event_other || '') : '', download: !!d.allow_download, date: r.reviewed_at || r.created_at, type: r.file_type };
 };
 
 export async function onRequest(context) {

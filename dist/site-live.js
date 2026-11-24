@@ -63,6 +63,18 @@
 
   document.querySelectorAll('form[data-live-form]').forEach((form) => {
     const type = form.dataset.liveForm;
+    const eventSel = form.querySelector('select[name="event_slug"]');
+    const otherWrap = form.querySelector('#event-other-wrap');
+    if (eventSel && otherWrap) {
+      const syncOther = () => {
+        const on = eventSel.value === 'other';
+        otherWrap.hidden = !on;
+        otherWrap.querySelector('input').required = on;
+        if (on) otherWrap.querySelector('input').focus();
+      };
+      eventSel.addEventListener('change', syncOther);
+      form.addEventListener('reset', () => setTimeout(() => { otherWrap.hidden = true; otherWrap.querySelector('input').required = false; }));
+    }
     const status = document.createElement('div');
     status.className = 'live-form-status';
     status.setAttribute('role', 'status');
@@ -164,7 +176,7 @@
     }
     d.innerHTML = `<form method="dialog"><button class="live-lightbox-close" aria-label="Close">×</button></form>
       <img src="/api/photo/${esc(p.id)}" alt="${esc(p.caption || 'Class photo')}">
-      <div class="live-lightbox-text"><p>${esc(p.caption)}</p><p class="muted">${p.credit ? 'Photo: ' + esc(p.credit) + ' · ' : ''}${esc(dateFmt.format(new Date(p.date)))}</p>
+      <div class="live-lightbox-text">${p.eventName ? `<p class="muted">${esc(p.eventName)}</p>` : ''}<p>${esc(p.caption)}</p><p class="muted">${p.credit ? 'Photo: ' + esc(p.credit) + ' · ' : ''}${esc(dateFmt.format(new Date(p.date)))}</p>
       ${p.download ? `<a class="btn-outline" href="/api/photo/${esc(p.id)}?download">Download</a>` : ''}</div>`;
     d.showModal();
   };
@@ -193,7 +205,10 @@
       grid.querySelectorAll('[data-photo]').forEach((b) => b.addEventListener('click', () => lightbox(shown[b.dataset.photo])));
       // Rebuild the event/month filters from the approved photos.
       const navs = document.querySelectorAll('main nav[aria-label="Event"], main nav[aria-label="Month"]');
-      const label = (slug) => slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      const NAMES = { 'first-day-of-senior-year': 'First Day of Senior Year', 'football-senior-night-2026': 'Football Senior Night', 'parent-teacher-conferences-fall-2026': 'Parent-Teacher Conferences',
+        'basketball-season-2026-27': 'Basketball Season', 'winter-break-2026': 'Winter Break', 'spring-break-2027': 'Spring Break', 'last-day-of-classes-2027': 'Last Day of Classes',
+        'graduation-2027': 'Graduation', 'homecoming-2026': 'Homecoming', 'prom-2027': 'Prom', other: 'Other' };
+      const label = (slug) => NAMES[slug] || slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
       const pills = (key, values, nameOf, anyLabel) => {
         const cur = q.get(key);
         return `<span class="mr-1 text-xs font-bold uppercase tracking-wider text-muted">${key === 'event' ? 'Event' : 'Month'}</span>` +

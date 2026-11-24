@@ -27,7 +27,7 @@ const fail = (e) => toast(e.message || 'Something went wrong.', true);
 
 const TYPES = { photo: 'Photo', contact: 'Message', spotlight: 'Nomination', directory: 'Directory sign-up', announcement: 'Announcement request', newsletter: 'Email sign-up' };
 const FIELD = {
-  name: 'Name', email: 'Email', caption: 'Caption', credit: 'Photo credit', event_slug: 'Event', allow_download: 'Downloads allowed', permission: 'Has permission',
+  name: 'Name', email: 'Email', caption: 'Caption', credit: 'Photo credit', event_slug: 'Event', event_other: 'Event (typed in)', allow_download: 'Downloads allowed', permission: 'Has permission',
   nominee_name: 'Nominee', activities: 'Activities', why: 'Why them', nominator_name: 'Nominated by', path_type: 'Path', future_plans: 'Plans', memory: 'Memory', quote: 'Quote',
   consent: 'Agreed to be listed', organization: 'Club / team', title: 'Headline', details: 'Details', requested_date: 'Post by', link: 'Link', topic: 'Topic', message: 'Message', categories: 'Wants',
 };
