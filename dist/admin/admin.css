@@ -159,3 +159,9 @@ details summary { cursor: pointer; color: var(--muted); }
 .statusbar b { color: var(--soft); font-weight: 500; }
 @media (max-width: 820px) { .statusbar { display: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+/* Photo caption (editable) */
+.caption-box { margin: 10px 0 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.cap-label { display: block; color: var(--muted); font: .72rem var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+.cap-text { margin: 4px 0 0; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.caption-edit textarea { min-height: 84px; }
+[hidden] { display: none !important; }

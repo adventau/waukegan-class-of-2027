@@ -31,7 +31,15 @@ const FIELD = {
   nominee_name: 'Nominee', activities: 'Activities', why: 'Why them', nominator_name: 'Nominated by', path_type: 'Path', future_plans: 'Plans', memory: 'Memory', quote: 'Quote',
   consent: 'Agreed to be listed', organization: 'Club / team', title: 'Headline', details: 'Details', requested_date: 'Post by', link: 'Link', topic: 'Topic', message: 'Message', categories: 'Wants',
 };
-const fieldList = (data) => '<dl class="fields">' + Object.entries(data).filter(([, v]) => v !== '' && v != null && !(Array.isArray(v) && !v.length))
+const EVENT_NAMES = { 'first-day-of-senior-year': 'First Day of Senior Year', 'football-senior-night-2026': 'Football Senior Night', 'parent-teacher-conferences-fall-2026': 'Parent-Teacher Conferences',
+  'basketball-season-2026-27': 'Basketball Season', 'winter-break-2026': 'Winter Break', 'spring-break-2027': 'Spring Break', 'last-day-of-classes-2027': 'Last Day of Classes',
+  'graduation-2027': 'Graduation', 'homecoming-2026': 'Homecoming', 'prom-2027': 'Prom', other: 'Other' };
+const fieldList = (raw) => {
+  const data = { ...raw };
+  if (data.event_slug) data.event_slug = EVENT_NAMES[data.event_slug] || data.event_slug;
+  return fieldListRaw(data);
+};
+const fieldListRaw = (data) => '<dl class="fields">' + Object.entries(data).filter(([, v]) => v !== '' && v != null && !(Array.isArray(v) && !v.length))
   .map(([k, v]) => `<dt>${esc(FIELD[k] || k)}</dt><dd>${k === 'email' ? `<a href="mailto:${esc(v)}">${esc(v)}</a>` : k === 'link' ? `<a href="${esc(v)}" target="_blank" rel="noopener noreferrer">${esc(v)}</a>` : esc(typeof v === 'boolean' ? (v ? 'Yes' : 'No') : Array.isArray(v) ? v.join(', ') : v)}</dd>`).join('') + '</dl>';
 
 // ---------------- Router ----------------
@@ -94,6 +102,7 @@ views.photos = async () => {
     ${items.length ? `<div class="grid g2">${items.map(photoCard).join('')}</div>` : `<div class="empty">${photoStatus === 'pending' ? 'No photos waiting for review.' : 'Nothing here yet.'}</div>`}`;
   $$('[data-st]').forEach((b) => b.addEventListener('click', () => { photoStatus = b.dataset.st; views.photos().catch(fail); }));
   $$('[data-act]').forEach((b) => b.addEventListener('click', () => act(b, views.photos)));
+  wireCaptions();
   $('#approve-all')?.addEventListener('click', async (e) => {
     if (!confirm(`Approve all ${items.length} photos? They'll all go on the site.`)) return;
     const btn = e.currentTarget;
@@ -117,7 +126,48 @@ function photoCard(it) {
     : it.status === 'approved'
       ? `<button class="btn red" data-act="reject" data-id="${it.id}" data-confirm="Take this photo down? It will disappear from the site and the file will be deleted.">Take down</button>`
       : `<button class="btn red" data-act="delete" data-id="${it.id}" data-confirm="Delete this record for good?">Delete record</button>`;
-  return `<article class="card photo-card">${img}<div class="body"><span class="muted small">Sent ${when(it.created_at)}</span>${fieldList(it.data)}<div class="row">${btns}</div></div></article>`;
+  const { caption = '', ...rest } = it.data;
+  return `<article class="card photo-card" data-photo-id="${it.id}">${img}<div class="body"><span class="muted small">Sent ${when(it.created_at)}</span>
+    <div class="caption-box">
+      <div class="caption-view"><div class="row between" style="align-items:flex-start;gap:12px"><div style="min-width:0"><span class="cap-label">Caption</span>
+        <p class="cap-text">${caption ? esc(caption) : '<span class="muted">No caption</span>'}</p></div>
+        <button class="btn" type="button" data-edit-caption="${it.id}">✎ Edit</button></div></div>
+      <form class="caption-edit" hidden><label for="cap-${it.id}">Caption</label>
+        <textarea id="cap-${it.id}" maxlength="500" rows="3">${esc(caption)}</textarea>
+        <div class="row between" style="margin-top:8px"><span class="muted small"><span data-left>${500 - caption.length}</span> characters left · also used as alt text</span>
+        <div class="row"><button class="btn" type="button" data-cancel-caption>Cancel</button><button class="btn gold" type="submit">Save caption</button></div></div></form>
+    </div>
+    ${fieldList(rest)}<div class="row">${btns}</div></div></article>`;
+}
+// Edit a caption in place, without reloading the list.
+function wireCaptions() {
+  $$('.photo-card').forEach((card) => {
+    const view = $('.caption-view', card);
+    const form = $('.caption-edit', card);
+    if (!view || !form) return;
+    const area = $('textarea', form);
+    const left = $('[data-left]', form);
+    const open = (on) => { view.hidden = on; form.hidden = !on; if (on) { area.focus(); area.setSelectionRange(area.value.length, area.value.length); } };
+    $('[data-edit-caption]', card).addEventListener('click', () => open(true));
+    $('[data-cancel-caption]', card).addEventListener('click', () => { area.value = area.defaultValue; left.textContent = 500 - area.value.length; open(false); });
+    area.addEventListener('input', () => { left.textContent = 500 - area.value.length; });
+    area.addEventListener('keydown', (e) => { if (e.key === 'Escape') $('[data-cancel-caption]', card).click(); if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) form.requestSubmit(); });
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = $('button[type=submit]', form);
+      btn.disabled = true;
+      try {
+        const out = await call('/api/admin/submissions/' + card.dataset.photoId, { method: 'POST', body: { action: 'caption', caption: area.value } });
+        area.defaultValue = out.caption;
+        $('.cap-text', card).innerHTML = out.caption ? esc(out.caption) : '<span class="muted">No caption</span>';
+        const img = $('img', card);
+        if (img) img.alt = out.caption || 'Submitted photo';
+        open(false);
+        toast('Caption saved');
+      } catch (err) { fail(err); }
+      btn.disabled = false;
+    });
+  });
 }
 async function act(btn, reload) {
   if (btn.dataset.confirm && !confirm(btn.dataset.confirm)) return;

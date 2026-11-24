@@ -172,7 +172,18 @@ async function admin({ request, env }, parts, method) {
   if (parts[0] === 'submissions' && parts[1] && method === 'POST') {
     const row = await env.DB.prepare('SELECT * FROM submissions WHERE id = ?').bind(parts[1]).first();
     if (!row) return json({ error: 'Not found' }, 404);
-    const { action } = await request.json().catch(() => ({}));
+    const { action, caption } = await request.json().catch(() => ({}));
+    if (action === 'caption') {
+      // Edit a photo's caption at any time (waiting, live, or rejected). It doubles as alt text on the site.
+      if (typeof caption !== 'string') return json({ error: 'Bad caption' }, 400);
+      const text = caption.trim();
+      if (text.length > 500) return json({ error: 'Please keep the caption under 500 characters.' }, 400);
+      let data = {};
+      try { data = JSON.parse(row.data); } catch {}
+      data.caption = text;
+      await env.DB.prepare('UPDATE submissions SET data = ? WHERE id = ?').bind(JSON.stringify(data), row.id).run();
+      return json({ ok: true, caption: text });
+    }
     if (action === 'delete' || action === 'reject') {
       // Rejected and deleted uploads are removed, not stored (see the privacy page).
       if (row.file_key) await env.FILES.delete(row.file_key);
