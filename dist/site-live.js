@@ -249,26 +249,6 @@
         <div class="mt-5 flex max-w-3xl flex-wrap items-center gap-2"><a class="btn-ghost" href="/announcements">← All news</a></div>`;
     }).catch(() => { postBox.innerHTML = '<p class="deck">This story could not be loaded. Please try again.</p>'; });
   }
+  // (The Events page timeline reads school-calendar.js directly, which already includes admin edits.)
 
-  // ---- Events page: redraw from the admin's edited list, if there is one ----
-  if (/^\/events\/?$/.test(path)) {
-    api('/api/content/calendar').then(({ value }) => {
-      if (!value) return;
-      const section = document.querySelector('[data-section="school"]');
-      if (!section) return;
-      section.querySelectorAll('.calendar-month').forEach((m) => m.remove());
-      const short = (d) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-      const months = new Map();
-      for (const r of value) { const k = r[0].slice(0, 7); if (!months.has(k)) months.set(k, []); months.get(k).push(r); }
-      const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Chicago' }).format(new Date()).slice(0, 7);
-      const openKey = [...months.keys()].find((k) => k >= today) || [...months.keys()].pop();
-      const html = [...months].map(([k, rows]) => `<details class="calendar-month"${k === openKey ? ' open' : ''}><summary>${new Date(k + '-15T12:00:00Z').toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</summary><div class="fixtures">` +
-        rows.map(([start, title, url, details, end]) => {
-          const id = (url.split('#')[1] || '').replace(/[^A-Za-z0-9_-]/g, '');
-          return `<article class="fixture"${id ? ` id="${id}"` : ''}><div><h3>${esc(title)}</h3><p>${short(start)}${end && end !== start ? ' – ' + short(end) : ''}</p>${details ? `<p>${esc(details)}</p>` : ''}</div></article>`;
-        }).join('') + '</div></details>').join('');
-      section.insertAdjacentHTML('beforeend', html);
-      if (location.hash) dispatchEvent(new HashChangeEvent('hashchange'));
-    }).catch(() => {});
-  }
 })();
